@@ -11,6 +11,7 @@ object Implicits extends App {
   final case class Apple(weightInGrams: Int, color: String)
   final case class Orange(weightInGrams: Int)
 
+  // Funtion that takes an orange.
   def func(orange: Orange): Unit = {
     println(
       "We're passing Apple to a function that expects an Orange, " +
@@ -18,6 +19,7 @@ object Implicits extends App {
     )
   }
 
+  // We pass an Apple to a function that takes an orange. The Apple is implicitly converted to Orange.
   func(
     Apple(
       weightInGrams = 300,
@@ -25,6 +27,7 @@ object Implicits extends App {
     )
   )
 
+  // Takes an Apple and produces an Orange. Marked implicit.
   implicit def AppleCanBeUsedAsOrange(apple: Apple): Orange =
     Orange(apple.weightInGrams)
 
