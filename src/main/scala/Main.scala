@@ -117,3 +117,65 @@ object ImplicitParamsSafe extends App {
   println(implicitly[First])
 
 }
+
+object AdhocPolymorphism extends App {
+
+  trait Printable[A] {
+    def print(a: A): Unit
+  }
+
+  // Implementation of print defined for String type.
+  implicit val stringPrintable: Printable[String] = new Printable[String] {
+    def print(a: String): Unit = println(s"String: $a")
+  }
+
+  // Implementation of print defined for Int type.
+  implicit val intPrintable: Printable[Int] = new Printable[Int] {
+    def print(a: Int): Unit = println(s"Int as String: ${a.toString}")
+  }
+
+  // The correct implementation is implicitly injected based on the type parameter.
+  def printIt[A](a: A)(implicit printable: Printable[A]): Unit = {
+    printable.print(a)
+  }
+
+  // This is another way for writing the printIt method.
+  // The syntax [A: Printable] is a context bound in Scala. 
+  // It's a shorthand that says "for some type A, given that A has an implicit value of type Printable[A] in scope". 
+  // It's a shorter way of expressing that an implicit Printable[A] is required.
+  def printIt2[A: Printable](a: A): Unit = {
+    val instance = implicitly[Printable[A]]
+    instance.print(a)
+  }
+
+  // -------------
+  // Type classes 
+  // -------------
+  // In Scala, a context bound is a type constraint that is expressed 
+  // with the syntax [A: B] in a type parameter list. It requires that 
+  // an implicit value of type B[A] is available.
+  // Context bounds are a syntactic sugar that effectively represents the 
+  // need for evidence of a type class for a certain type. They are often 
+  // used in combination with the implicitly function to retrieve the 
+  // implicit value, which provides the functionality associated with the type class.
+  
+
+  // In Scala, a type class is a pattern that allows you to add new behavior to 
+  // existing classes without modifying them, and without needing to control their 
+  // source code. It's a form of ad-hoc polymorphism.
+  // In the context of type classes, "evidence" usually means an instance of a type 
+  // class for a specific type. So, "evidence of a Show[A] type class for a certain type A" 
+  // would mean an implicit value of type Show[A].
+  // So, when we say that a context bound represents the need for evidence of a type class 
+  // for a certain type, we mean that it requires the presence of a specific type class 
+  // instance for a given type. It's called "evidence" because the presence of this instance 
+  // proves to the compiler that the necessary behavior (as defined by the type class) exists 
+  // for the given type.
+
+  printIt(123)
+  printIt("str")
+
+  printIt2(123)
+  printIt2("str")
+
+}
